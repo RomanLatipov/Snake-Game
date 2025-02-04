@@ -7,9 +7,11 @@ using namespace std;
 bool gameOver;
 const int width = 20;
 const int height = 20;
-int x, y, fruitX, fruitY;
+int x, y, fruitX, fruitY, score;
 enum eDirection {Stop = 0, Left, Right, Up, Down};
 eDirection dir;
+int tailX[100], tailY[100];
+int tail;
 
 void setup() {
     gameOver = false;
@@ -17,6 +19,7 @@ void setup() {
     y = height / 2;
     fruitX = rand() % width;
     fruitY = rand() % height;
+    score = 0;
 }
 void draw() {
     system("cls");
@@ -35,8 +38,18 @@ void draw() {
                 cout << "0";
             else if (i == fruitY && j == fruitX)
                 cout << "O";
-            else
-                cout << " ";
+            else {
+                bool print = false;
+                for (int k = 0; k < tail; k++) {
+                    if (tailX[k] == j && tailY[k] == i) {
+                        cout << "o";
+                        print = true;
+                    }
+
+                }
+                if (!print)
+                    cout << " ";
+            }
 
             if (j == width - 1)
                 cout << "#";
@@ -46,6 +59,8 @@ void draw() {
      for(int i=0; i<width+2; i++) {
        cout << "#";
      }
+     cout << endl;
+     cout << "Score: " << score << endl;
 }
 void input() {
     if (_kbhit()) {
@@ -63,6 +78,21 @@ void input() {
     }
 }
 void logic() {
+    int prevX = tailX[0];
+    int prevY = tailY[0];
+    tailX[0] = x;
+    tailY[0] = y;
+    int prev2X, prev2Y;
+
+    for (int i = 1; i < tail; i++) {
+        prev2X = tailX[i];
+        prev2Y = tailY[i];
+        tailX[i] = prevX;
+        tailY[i] = prevY;
+        prevX = prev2X;
+        prevY = prev2Y;
+    }
+
     if (dir == Up)
         y--;
     if (dir == Down)
@@ -77,6 +107,8 @@ void logic() {
     if (x == fruitX && y == fruitY) {
         fruitX = rand() % width;
         fruitY = rand() % height;
+        score += 10;
+        tail++;
     }
 }
 int main() {
@@ -85,6 +117,6 @@ int main() {
         draw();
         input();
         logic();
-        Sleep(30);
+        Sleep(50);
     }
 }
